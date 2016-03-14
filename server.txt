@@ -1,0 +1,1242 @@
+uses	windows,math,dos,wincrt,graph;
+var	sC,invul,ssc,i,io:integer;
+	hits,ctrl,p,q,jde,x,y,w,j,n,dj:integer;
+	vx,vy,dx,dy:real;
+	t,g:real;
+	input,swordcolor:char;
+	m:array[1..13] of boolean;
+	o:array[1..50,1..20] of integer;
+	r,k,s,l:boolean;
+	bag:array['a'..'z','a'..'z'] of integer;
+	msg,health:string;
+procedure hit(a:integer);
+begin
+	if invul=0
+		then begin
+			a:=floor((floor((bag['h','p']/50*a))+a)/10);
+			bag['h','p']:=bag['h','p']+a;
+			case a of
+				1..10:a:=a*50;
+				11..20:a:=(100)+((10-a)*8);
+				21..40:a:=(180)+((20-a)*12);
+				41..maxint:a:=(300)+floor(a/10);
+			end;
+			case bag['h','p'] of
+				0..50:if w=1
+					then bag['v','x']:=bag['v','x']-a
+					else bag['v','x']:=bag['v','x']+a;
+				51..100:if w=1
+					then begin
+						bag['v','x']:=bag['v','x']-a;
+						bag['v','y']:=bag['v','y']-floor(a/5);
+					end
+					else begin
+						bag['v','x']:=bag['v','x']+a;
+						bag['v','y']:=bag['v','y']-floor(a/5);
+					end;
+				101..maxint:if w=1
+					then begin
+						bag['v','x']:=bag['v','x']-a;
+						bag['v','y']:=bag['v','y']-floor(a/2);
+					end
+					else begin
+						bag['v','x']:=bag['v','x']+a;
+						bag['v','y']:=bag['v','y']-floor(a/2);
+					end;
+			end;
+			//invul:=5;
+		end;
+end;
+procedure sandbag();
+begin
+	if invul>0
+		then setColor(19)
+		else setColor(white);
+	line(0+bag['x','a'],8+bag['y','a'],0+bag['x','a'],10+bag['y','a']);
+	line(2+bag['x','a'],12+bag['y','a'],2+bag['x','a'],16+bag['y','a']);
+	line(4+bag['x','a'],18+bag['y','a'],4+bag['x','a'],54+bag['y','a']);
+	line(2+bag['x','a'],54+bag['y','a'],2+bag['x','a'],72+bag['y','a']);
+	line(4+bag['x','a'],74+bag['y','a'],6+bag['x','a'],74+bag['y','a']);
+	line(8+bag['x','a'],76+bag['y','a'],22+bag['x','a'],76+bag['y','a']);
+	line(24+bag['x','a'],74+bag['y','a'],26+bag['x','a'],74+bag['y','a']);
+	line(28+bag['x','a'],72+bag['y','a'],28+bag['x','a'],54+bag['y','a']);
+	line(30+bag['x','a'],52+bag['y','a'],30+bag['x','a'],18+bag['y','a']);
+	line(28+bag['x','a'],16+bag['y','a'],28+bag['x','a'],12+bag['y','a']);
+	line(26+bag['x','a'],10+bag['y','a'],26+bag['x','a'],8+bag['y','a']);
+	line(6+bag['x','a'],2+bag['y','a'],1+bag['x','a'],7+bag['y','a']);
+	line(20+bag['x','a'],2+bag['y','a'],25+bag['x','a'],7+bag['y','a']);
+	line(6+bag['x','a'],2+bag['y','a'],20+bag['x','a'],2+bag['y','a']);
+	line(5+bag['x','a'],21+bag['y','a'],5+bag['x','a'],27+bag['y','a']);
+	line(6+bag['x','a'],20+bag['y','a'],6+bag['x','a'],28+bag['y','a']);
+	line(7+bag['x','a'],20+bag['y','a'],7+bag['x','a'],28+bag['y','a']);
+	line(8+bag['x','a'],21+bag['y','a'],8+bag['x','a'],27+bag['y','a']);
+	line(15+bag['x','a'],21+bag['y','a'],15+bag['x','a'],27+bag['y','a']);
+	line(16+bag['x','a'],20+bag['y','a'],16+bag['x','a'],28+bag['y','a']);
+	line(17+bag['x','a'],20+bag['y','a'],17+bag['x','a'],28+bag['y','a']);
+	line(18+bag['x','a'],21+bag['y','a'],18+bag['x','a'],27+bag['y','a']);
+	line(6+bag['x','a'],40+bag['y','a'],16+bag['x','a'],41+bag['y','a']);
+	setColor(black);
+	line(6+bag['x','a'],23+bag['y','a'],6+bag['x','a'],25+bag['y','a']);
+	line(16+bag['x','a'],23+bag['y','a'],16+bag['x','a'],25+bag['y','a']);
+end;
+procedure clearSandbag();
+begin
+	setColor(black);
+	line(0+bag['x','a'],8+bag['y','a'],0+bag['x','a'],10+bag['y','a']);
+	line(2+bag['x','a'],12+bag['y','a'],2+bag['x','a'],16+bag['y','a']);
+	line(4+bag['x','a'],18+bag['y','a'],4+bag['x','a'],54+bag['y','a']);
+	line(2+bag['x','a'],54+bag['y','a'],2+bag['x','a'],72+bag['y','a']);
+	line(4+bag['x','a'],74+bag['y','a'],6+bag['x','a'],74+bag['y','a']);
+	line(8+bag['x','a'],76+bag['y','a'],22+bag['x','a'],76+bag['y','a']);
+	line(24+bag['x','a'],74+bag['y','a'],26+bag['x','a'],74+bag['y','a']);
+	line(28+bag['x','a'],72+bag['y','a'],28+bag['x','a'],54+bag['y','a']);
+	line(30+bag['x','a'],52+bag['y','a'],30+bag['x','a'],18+bag['y','a']);
+	line(28+bag['x','a'],16+bag['y','a'],28+bag['x','a'],12+bag['y','a']);
+	line(26+bag['x','a'],10+bag['y','a'],26+bag['x','a'],8+bag['y','a']);
+	line(6+bag['x','a'],2+bag['y','a'],1+bag['x','a'],7+bag['y','a']);
+	line(20+bag['x','a'],2+bag['y','a'],25+bag['x','a'],7+bag['y','a']);
+	line(6+bag['x','a'],2+bag['y','a'],20+bag['x','a'],2+bag['y','a']);
+	line(5+bag['x','a'],21+bag['y','a'],5+bag['x','a'],27+bag['y','a']);
+	line(6+bag['x','a'],20+bag['y','a'],6+bag['x','a'],28+bag['y','a']);
+	line(7+bag['x','a'],20+bag['y','a'],7+bag['x','a'],28+bag['y','a']);
+	line(6+bag['x','a'],23+bag['y','a'],6+bag['x','a'],25+bag['y','a']);
+	line(8+bag['x','a'],21+bag['y','a'],8+bag['x','a'],27+bag['y','a']);
+	line(15+bag['x','a'],21+bag['y','a'],15+bag['x','a'],27+bag['y','a']);
+	line(16+bag['x','a'],20+bag['y','a'],16+bag['x','a'],28+bag['y','a']);
+	line(17+bag['x','a'],20+bag['y','a'],17+bag['x','a'],28+bag['y','a']);
+	line(16+bag['x','a'],23+bag['y','a'],16+bag['x','a'],25+bag['y','a']);
+	line(18+bag['x','a'],21+bag['y','a'],18+bag['x','a'],27+bag['y','a']);
+	line(6+bag['x','a'],40+bag['y','a'],16+bag['x','a'],41+bag['y','a']);
+end;
+procedure clearIke(a,b,c:integer);
+begin
+	if c=0
+		then begin
+			setColor(black);
+			if ssc=0
+				then begin
+					line(30+a,0+b,25+a,3+b);
+					line(30+a,0+b,29+a,5+b);
+					line(25+a,3+b,10+a,30+b);
+					line(29+a,5+b,14+a,32+b);
+				end;
+			line(13+a,33+b,9+a,29+b);
+			line(11+a,35+b,7+a,31+b);
+			line(13+a,33+b,11+a,35+b);
+			line(9+a,29+b,7+a,27+b);
+			line(7+a,31+b,5+a,29+b);
+			line(7+a,27+b,6+a,21+b);
+			line(5+a,29+b,2+a,21+b);
+			line(0+a,21+b,8+a,21+b);
+			line(0+a,21+b,2+a,18+b);
+			line(8+a,21+b,2+a,18+b);
+			line(8+a,21+b,14+a,21+b);
+			line(2+a,18+b,16+a,18+b);
+			line(2+a,18+b,8+a,15+b);
+			line(8+a,15+b,8+a,17+b);
+			line(13+a,15+b,13+a,17+b);
+			rectangle(8+a,15+b,15+a,11+b); 
+			rectangle(6+a,10+b,15+a,9+b);
+			line(15+a,8+b,6+a,8+b);
+			line(17+a,33+b,17+a,30+b);
+			line(17+a,33+b,14+a,33+b);
+			line(17+a,30+b,18+a,26+b);
+			line(5+a,29+b,3+a,39+b);
+			line(3+a,39+b,3+a,45+b);
+			line(6+a,45+b,8+a,34+b);
+			rectangle(2+a,45+b,6+a,54+b);
+			line(14+a,31+b,15+a,35+b);
+			line(18+a,30+b,19+a,35+b);
+			line(15+a,35+b,15+a,44+b);
+			line(19+a,35+b,19+a,44+b);
+			rectangle(15+a,45+b,19+a,54+b);
+		end
+		else if c=1
+			then begin
+				setColor(black);
+				if ssc=0
+					then begin
+						line(40-30+a,0+b,40-25+a,3+b);
+						line(40-30+a,0+b,40-29+a,5+b);
+						line(40-25+a,3+b,40-10+a,30+b);
+						line(40-29+a,5+b,40-14+a,32+b);
+					end;
+				line(40-13+a,33+b,40-9+a,29+b);
+				line(40-11+a,35+b,40-7+a,31+b);
+				line(40-13+a,33+b,40-11+a,35+b);
+				line(40-9+a,29+b,40-7+a,27+b);
+				line(40-7+a,31+b,40-5+a,29+b);
+				line(40-7+a,27+b,40-6+a,21+b);
+				line(40-5+a,29+b,40-2+a,21+b);
+				line(40-0+a,21+b,40-8+a,21+b);
+				line(40-0+a,21+b,40-2+a,18+b);
+				line(40-8+a,21+b,40-2+a,18+b);
+				line(40-8+a,21+b,40-14+a,21+b);
+				line(40-2+a,18+b,40-16+a,18+b);
+				line(40-2+a,18+b,40-8+a,15+b);
+				line(40-8+a,15+b,40-8+a,17+b);
+				line(40-13+a,15+b,40-13+a,17+b);
+				rectangle(40-8+a,15+b,40-15+a,11+b); 
+				rectangle(40-6+a,10+b,40-15+a,9+b);
+				line(40-15+a,8+b,40-6+a,8+b);
+				line(40-17+a,33+b,40-17+a,30+b);
+				line(40-17+a,33+b,40-14+a,33+b);
+				line(40-17+a,30+b,40-18+a,26+b);
+				line(40-5+a,29+b,40-3+a,39+b);
+				line(40-3+a,39+b,40-3+a,45+b);
+				line(40-6+a,45+b,40-8+a,34+b);
+				rectangle(40-2+a,45+b,40-6+a,54+b);
+				line(40-14+a,31+b,40-15+a,35+b);
+				line(40-18+a,30+b,40-19+a,35+b);
+				line(40-15+a,35+b,40-15+a,44+b);
+				line(40-19+a,35+b,40-19+a,44+b);
+				rectangle(40-15+a,45+b,40-19+a,54+b);
+			end
+			else begin
+				setColor(black);
+				if ssc=0
+					then begin
+						line(30+a,55-0+b,25+a,55-3+b);
+						line(30+a,55-0+b,29+a,55-5+b);
+						line(25+a,55-3+b,10+a,55-30+b);
+						line(29+a,55-5+b,14+a,55-32+b);
+					end;
+				line(13+a,55-33+b,9+a,55-29+b);
+				line(11+a,55-35+b,7+a,55-31+b);
+				line(13+a,55-33+b,11+a,55-35+b);
+				line(9+a,55-29+b,7+a,55-27+b);
+				line(7+a,55-31+b,5+a,55-29+b);
+				line(7+a,55-27+b,6+a,55-21+b);
+				line(5+a,55-29+b,2+a,55-21+b);
+				line(0+a,55-21+b,8+a,55-21+b);
+				line(0+a,55-21+b,2+a,55-18+b);
+				line(8+a,55-21+b,2+a,55-18+b);
+				line(8+a,55-21+b,14+a,55-21+b);
+				line(2+a,55-18+b,16+a,55-18+b);
+				line(2+a,55-18+b,8+a,55-15+b);
+				line(8+a,55-15+b,8+a,55-17+b);
+				line(13+a,55-15+b,13+a,55-17+b);
+				rectangle(8+a,55-15+b,15+a,55-11+b); 
+				rectangle(6+a,55-10+b,15+a,55-9+b);
+				line(15+a,55-8+b,6+a,55-8+b);
+				line(17+a,55-33+b,17+a,55-30+b);
+				line(17+a,55-33+b,14+a,55-33+b);
+				line(17+a,55-30+b,18+a,55-26+b);
+				line(5+a,55-29+b,3+a,55-39+b);
+				line(3+a,55-39+b,3+a,55-45+b);
+				line(6+a,55-45+b,8+a,55-34+b);
+				rectangle(2+a,55-45+b,6+a,55-54+b);
+				line(14+a,55-31+b,15+a,55-35+b);
+				line(18+a,55-30+b,19+a,55-35+b);
+				line(15+a,55-35+b,15+a,55-44+b);
+				line(19+a,55-35+b,19+a,55-44+b);
+				rectangle(15+a,55-45+b,19+a,55-54+b);
+			end;
+end;
+procedure ike(a,b,c:integer);
+begin
+	if c=0
+		then begin
+			if ssc=0
+				then begin
+					if not(swordcolor='b')
+						then setColor(yellow)
+						else setColor(lightBlue);
+					line(30+a,0+b,25+a,3+b);
+					line(30+a,0+b,29+a,5+b);
+					line(25+a,3+b,10+a,30+b);
+					line(29+a,5+b,14+a,32+b);
+				end;
+			setColor(lightBlue);
+			line(13+a,33+b,9+a,29+b);
+			line(11+a,35+b,7+a,31+b);
+			line(13+a,33+b,11+a,35+b);
+			setColor(white);
+			line(9+a,29+b,7+a,27+b);
+			line(7+a,31+b,5+a,29+b);
+			line(7+a,27+b,6+a,21+b);
+			line(5+a,29+b,2+a,21+b);
+			setColor(lightBlue);
+			line(0+a,21+b,8+a,21+b);
+			line(0+a,21+b,2+a,18+b);
+			setColor(red);
+			line(8+a,21+b,2+a,18+b);
+			line(8+a,21+b,14+a,21+b);
+			line(2+a,18+b,16+a,18+b);
+			line(2+a,18+b,8+a,15+b);
+			setColor(white);
+			line(8+a,15+b,8+a,17+b);
+			line(13+a,15+b,13+a,17+b);
+			rectangle(8+a,15+b,15+a,11+b); 
+			setColor(lightBlue);
+			rectangle(6+a,10+b,15+a,9+b);
+			line(15+a,8+b,6+a,8+b);
+			line(17+a,33+b,17+a,30+b);
+			line(17+a,33+b,14+a,33+b);
+			setColor(white);
+			line(17+a,30+b,18+a,26+b);
+			line(5+a,29+b,3+a,39+b);
+			line(3+a,39+b,3+a,45+b);
+			line(6+a,45+b,8+a,34+b);
+			setColor(8);
+			rectangle(2+a,45+b,6+a,54+b);
+			setColor(white);
+			line(14+a,31+b,15+a,35+b);
+			line(18+a,30+b,19+a,35+b);
+			line(15+a,35+b,15+a,44+b);
+			line(19+a,35+b,19+a,44+b);
+			setColor(8);
+			rectangle(15+a,45+b,19+a,54+b);
+		end
+		else if c=1 
+			then begin
+				if ssc=0
+					then begin
+					if not(swordcolor='b')
+						then setColor(yellow)
+						else setColor(lightBlue);
+						line(40-30+a,0+b,40-25+a,3+b);
+						line(40-30+a,0+b,40-29+a,5+b);
+						line(40-25+a,3+b,40-10+a,30+b);
+						line(40-29+a,5+b,40-14+a,32+b);
+					end;
+				setColor(lightBlue);
+				line(40-13+a,33+b,40-9+a,29+b);
+				line(40-11+a,35+b,40-7+a,31+b);
+				line(40-13+a,33+b,40-11+a,35+b);
+				setColor(white);
+				line(40-9+a,29+b,40-7+a,27+b);
+				line(40-7+a,31+b,40-5+a,29+b);
+				line(40-7+a,27+b,40-6+a,21+b);
+				line(40-5+a,29+b,40-2+a,21+b);
+				setColor(lightBlue);
+				line(40-0+a,21+b,40-8+a,21+b);
+				line(40-0+a,21+b,40-2+a,18+b);
+				setColor(red);
+				line(40-8+a,21+b,40-2+a,18+b);
+				line(40-8+a,21+b,40-14+a,21+b);
+				line(40-2+a,18+b,40-16+a,18+b);
+				line(40-2+a,18+b,40-8+a,15+b);
+				setColor(white);
+				line(40-8+a,15+b,40-8+a,17+b);
+				line(40-13+a,15+b,40-13+a,17+b);
+				rectangle(40-8+a,15+b,40-15+a,11+b); 
+				setColor(lightBlue);
+				rectangle(40-6+a,10+b,40-15+a,9+b);
+				line(40-15+a,8+b,40-6+a,8+b);
+				line(40-17+a,33+b,40-17+a,30+b);
+				line(40-17+a,33+b,40-14+a,33+b);
+				setColor(white);
+				line(40-17+a,30+b,40-18+a,26+b);
+				line(40-5+a,29+b,40-3+a,39+b);
+				line(40-3+a,39+b,40-3+a,45+b);
+				line(40-6+a,45+b,40-8+a,34+b);
+				setColor(8);
+				rectangle(40-2+a,45+b,40-6+a,54+b);
+				setColor(white);
+				line(40-14+a,31+b,40-15+a,35+b);
+				line(40-18+a,30+b,40-19+a,35+b);
+				line(40-15+a,35+b,40-15+a,44+b);
+				line(40-19+a,35+b,40-19+a,44+b);
+				setColor(8);
+				rectangle(40-15+a,45+b,40-19+a,54+b);
+			end
+			else begin
+				if ssc=0
+					then begin
+					if not(swordcolor='b')
+						then setColor(yellow)
+						else setColor(lightBlue);
+						line(30+a,55-0+b,25+a,55-3+b);
+						line(30+a,55-0+b,29+a,55-5+b);
+						line(25+a,55-3+b,10+a,55-30+b);
+						line(29+a,55-5+b,14+a,55-32+b);
+					end;
+				setColor(lightBlue);
+				line(13+a,55-33+b,9+a,55-29+b);
+				line(11+a,55-35+b,7+a,55-31+b);
+				line(13+a,55-33+b,11+a,55-35+b);
+				setColor(white);
+				line(9+a,55-29+b,7+a,55-27+b);
+				line(7+a,55-31+b,5+a,55-29+b);
+				line(7+a,55-27+b,6+a,55-21+b);
+				line(5+a,55-29+b,2+a,55-21+b);
+				setColor(lightBlue);
+				line(0+a,55-21+b,8+a,55-21+b);
+				line(0+a,55-21+b,2+a,55-18+b);
+				setColor(red);
+				line(8+a,55-21+b,2+a,55-18+b);
+				line(8+a,55-21+b,14+a,55-21+b);
+				line(2+a,55-18+b,16+a,55-18+b);
+				line(2+a,55-18+b,8+a,55-15+b);
+				setColor(white);
+				line(8+a,55-15+b,8+a,55-17+b);
+				line(13+a,55-15+b,13+a,55-17+b);
+				rectangle(8+a,55-15+b,15+a,55-11+b); 
+				setColor(lightBlue);
+				rectangle(6+a,55-10+b,15+a,55-9+b);
+				line(15+a,55-8+b,6+a,55-8+b);
+				line(17+a,55-33+b,17+a,55-30+b);
+				line(17+a,55-33+b,14+a,55-33+b);
+				setColor(white);
+				line(17+a,55-30+b,18+a,55-26+b);
+				line(5+a,55-29+b,3+a,55-39+b);
+				line(3+a,55-39+b,3+a,55-45+b);
+				line(6+a,55-45+b,8+a,55-34+b);
+				setColor(8);
+				rectangle(2+a,55-45+b,6+a,55-54+b);
+				setColor(white);
+				line(14+a,55-31+b,15+a,55-35+b);
+				line(18+a,55-30+b,19+a,55-35+b);
+				line(15+a,55-35+b,15+a,55-44+b);
+				line(19+a,55-35+b,19+a,55-44+b);
+				setColor(8);
+				rectangle(15+a,55-45+b,19+a,55-54+b);
+			end;
+end;
+procedure createObject(a:integer);
+begin
+	for io:=1 to 50 do
+		if o[io,1]=0
+			then break;
+	o[io,1]:=a;
+	if a=1
+		then begin
+			o[io,2]:=x+12;
+			o[io,3]:=y+48;
+			o[io,4]:=10;
+			o[io,5]:=20;
+			o[io,6]:=5;
+		end;
+	if a=2
+		then if w=1
+			then begin
+				inc(ssc);
+				o[io,2]:=x+25;
+				o[io,3]:=y+27;
+				o[io,4]:=270;
+				o[io,5]:=120;
+			end
+			else begin
+				inc(ssc);
+				o[io,2]:=x+10;
+				o[io,3]:=y+27;
+				o[io,4]:=270;
+				o[io,5]:=420;
+			end;
+	if a=3
+		then begin
+			o[io,2]:=x+23;
+			o[io,3]:=y+5;
+			o[io,4]:=10;
+			vy:=-30;
+			inc(ssc);
+		end;
+	if a=4
+		then begin
+			o[io,2]:=x+23;
+			o[io,3]:=y+5;
+			o[io,4]:=4;
+			if y>=795
+				then vy:=-20;
+			inc(ssc);
+		end;
+	if a=5
+		then begin
+			o[io,2]:=x+13;
+			o[io,4]:=13;
+			vy:=0;
+			vx:=0;
+			w:=0;
+			inc(ssc);
+		end;
+		
+	if a=6
+		then begin
+			o[io,2]:=x+23;
+			o[io,4]:=13;
+			vy:=0;
+			vx:=0;
+			w:=1;
+			inc(ssc);
+		end;
+	if a=7
+		then begin
+			o[io,2]:=x+23;
+			o[io,3]:=270;
+			o[io,4]:=30;
+			o[io,5]:=y+5;
+			vx:=0;
+			inc(ssc);
+		end;
+	if a=8
+		then begin
+			o[io,2]:=x+23;
+			o[io,3]:=270;
+			o[io,4]:=30;
+			o[io,5]:=y+5;
+			vx:=0;
+			inc(ssc);
+		end;
+	if a=9
+		then begin
+			o[io,2]:=10;
+			o[io,3]:=x+40;
+		end;
+	if a=10
+		then begin
+			o[io,2]:=10;
+			o[io,3]:=x;
+		end;
+end;
+procedure objectPhysics(a:integer);
+var 	angle:integer;
+begin
+	if o[a,1]=1
+		then begin
+			dec(o[a,6]);
+			if o[a,6]>0
+				then begin
+					setColor(15);
+					o[a,4]:=2+o[a,4];
+					o[a,5]:=2+o[a,5];
+					ellipse(o[a,2],o[a,3],0,360,o[a,5],o[a,4]);
+				end
+				else begin
+					setColor(black);
+					ellipse(o[a,2],o[a,3],0,360,o[a,5],o[a,4]);
+					for io:=1 to 6 do
+						o[a,io]:=0;
+				end;
+		end;
+	if o[a,1]=2
+		then begin
+			if o[a,5]=120
+				then begin
+					o[a,4]:=o[a,4]-15;
+					l:=o[a,4]>=o[a,5];
+				end
+				else begin
+					o[a,4]:=o[a,4]+15;
+					l:=o[a,4]<=o[a,5];
+				end;
+			if l
+				then begin
+					l:=false;
+					setColor(yellow);
+					angle:=o[a,4];
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,3];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(10);
+				end
+				else begin
+					for n:=1 to 15 do
+						o[a,n]:=0;
+					dec(ssc);
+				end;
+			if o[a,5]=120
+				then o[a,4]:=o[a,4]-15
+				else o[a,4]:=o[a,4]+15;
+		end;
+	if o[a,1]=3
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]<>0
+			 	then begin
+			 		o[a,3]:=o[a,3]-2*(10-o[a,4]);
+					setColor(yellow);
+					angle:=270;
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,3];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(20);
+				end
+				else begin
+					for n:=1 to 15 do
+						o[a,n]:=0;
+					dec(ssc);
+				end;
+		end;
+	if o[a,1]=4
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]<>0
+			 	then begin
+			 		o[a,3]:=o[a,3]+2*(10-o[a,4]);
+					setColor(yellow);
+					angle:=90;
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,3];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(30);
+				end
+				else begin
+					for n:=1 to 15 do
+						o[a,n]:=0;
+					dec(ssc);
+				end;
+		end;
+	if o[a,1]=5
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]<>0
+			 	then begin
+			 		n:=o[a,4];
+					case n of
+						3..13:o[a,2]:=o[a,2]+30;
+					end;
+					x:=o[a,2];
+					o[a,3]:=y+25;
+					setColor(lightBlue);
+					angle:=0;
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,3];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(15);
+				end
+				else begin
+					for n:=1 to 15 do
+						o[a,n]:=0;
+					dec(ssc);
+				end;
+		end;
+	if o[a,1]=6
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]<>0
+			 	then begin
+			 		n:=o[a,4];
+					case n of
+						3..13:o[a,2]:=o[a,2]-30;
+					end;
+					x:=o[a,2]-38;
+					o[a,3]:=y+25;
+					setColor(lightBlue);
+					angle:=180;
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,3];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(15);
+				end
+				else begin
+					for n:=1 to 15 do
+						o[a,n]:=0;
+					dec(ssc);
+				end;
+		end;
+	if o[a,1]=7
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]>-50
+			 	then begin
+			 		n:=o[a,4];
+					case n of
+						18..27:begin
+							o[a,5]:=o[a,5]-25;
+							o[a,3]:=o[a,3]+60;
+						end;
+						17:o[a,3]:=180;
+						16:begin
+							o[a,20]:=ceil((abs(y-o[a,5]))/5);
+							y:=y-o[a,20];
+							r:=true;
+						end;
+						12..15:begin
+							y:=y-o[a,20];
+							x:=o[a,2]-23;
+						end;
+						11:begin
+							y:=o[a,5]-25;
+							r:=false;
+							x:=o[a,2]-23;
+						end;
+						-49..10:begin
+							g:=30;
+							o[a,5]:=y+40;
+							x:=o[a,2]-23;
+							if y=795
+								then o[a,4]:=-50;
+						end;
+					end;
+					setColor(lightBlue);
+					angle:=o[a,3];
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,5];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(30);
+				end
+				else begin
+					for n:=1 to 16 do
+						o[a,n]:=0;
+					dec(ssc);
+					g:=15;
+					createObject(10);
+				end;
+		end;
+	if o[a,1]=8
+		then begin
+			 dec(o[a,4]);
+			 if o[a,4]>-50
+			 	then begin
+			 		n:=o[a,4];
+					case n of
+						18..27:begin
+							o[a,5]:=o[a,5]-25;
+							o[a,3]:=o[a,3]-60;
+						end;
+						17:o[a,3]:=0;
+						16:begin
+							o[a,20]:=ceil((abs(y-o[a,5]))/5);
+							y:=y-o[a,20];
+							r:=true;
+						end;
+						12..15:begin
+							y:=y-o[a,20];
+							x:=o[a,2]-23;
+						end;
+						11:begin
+							y:=o[a,5]-25;
+							r:=false;
+							x:=o[a,2]-23;
+						end;
+						-49..10:begin
+							g:=30;
+							o[a,5]:=y+40;
+							x:=o[a,2]-23;
+							if y=795
+								then o[a,4]:=-50;
+						end;
+					end;
+					setColor(lightBlue);
+					angle:=o[a,3];
+					for n:=6 to 15 do
+						o[a,n]:=0;
+					p:=o[a,2];
+					n:=o[a,5];
+					o[a,6]:=floor(p+(cos(angle/57.3)*10));
+					o[a,11]:=floor(n+(sin(angle/57.3)*10));
+					o[a,7]:=floor(o[a,6]+(cos(angle/57.3)*70));
+					o[a,12]:=floor(o[a,11]+(sin(angle/57.3)*70));
+					o[a,8]:=floor(o[a,7]-(sin((angle-45)/57.3)*10));
+					o[a,13]:=floor(o[a,12]+(cos((angle-45)/57.3)*10));
+					o[a,9]:=floor(o[a,8]-(sin((angle+45)/57.3)*10));
+					o[a,14]:=floor(o[a,13]+(cos((angle+45)/57.3)*10));
+					o[a,10]:=floor(o[a,9]-(sin((angle+90)/57.3)*70));
+					o[a,15]:=floor(o[a,14]+(cos((angle+90)/57.3)*70));
+					for n:=0 to 3 do
+						line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+					o[a,16]:=floor((o[a,6]+o[a,7])/2);
+					o[a,17]:=floor((o[a,11]+o[a,12])/2);
+					o[a,18]:=floor((o[a,9]+o[a,10])/2);
+					o[a,19]:=floor((o[a,14]+o[a,15])/2);
+					for n:=0 to 6 do
+						if (((o[a,6+n]>=bag['x','a']) and (o[a,6+n]<=bag['x','a']+30) and (o[a,11+n]>=bag['y','a']) and (o[a,11+n]<=bag['y','a']+78)))
+							then hit(50);
+				end
+				else begin
+					for n:=1 to 16 do
+						o[a,n]:=0;
+					dec(ssc);
+					g:=15;
+					createObject(9);
+				end;
+		end;
+	if o[a,1]=9
+		then begin
+			dec(o[a,2]);
+			if o[a,2]>0
+				then begin
+					for n:=1 to 11 do
+						line(o[a,3]+0+(200-(o[a,2]*20)),795+5+(n*5),o[a,3]+30+(200-(o[a,2]*20)),795+0+(n*5));
+				end
+				else begin
+					for n:=1 to 3 do
+						o[a,n]:=0;
+				end;
+		end;
+	if o[a,1]=10
+		then begin
+			dec(o[a,2]);
+			if o[a,2]>0
+				then begin
+					for n:=1 to 11 do
+						line(o[a,3]+0-(200-(o[a,2]*20)),795+5+(n*5),o[a,3]+30-(200-(o[a,2]*20)),795+0+(n*5));
+				end
+				else begin
+					for n:=1 to 3 do
+						o[a,n]:=0;
+				end;
+		end;
+end;
+procedure clearObject(a:integer);
+begin
+	if o[a,1]=1
+		then begin
+			setColor(black);
+			ellipse(o[a,2],o[a,3],0,360,o[a,5],o[a,4]);
+		end;
+	if o[a,1]=2
+		then begin
+			setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=3
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=4
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=5
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=6
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=7
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=8
+		then begin
+		setColor(black);
+			for n:=0 to 3 do
+				line(o[a,6+n],o[a,11+n],o[a,7+n],o[a,12+n]);
+		end;
+	if o[a,1]=9
+		then begin
+			setColor(black);
+			for n:=1 to 11 do
+				line(o[a,3]+0+(200-(o[a,2]*20)),795+5+(n*5),o[a,3]+30+(200-(o[a,2]*20)),795+0+(n*5));
+		end;
+	if o[a,1]=10
+		then begin
+			setColor(black);
+			for n:=1 to 11 do
+				line(o[a,3]+0-(200-(o[a,2]*20)),795+5+(n*5),o[a,3]+30-(200-(o[a,2]*20)),795+0+(n*5));
+		end;
+end;
+procedure fun(a:integer);
+begin
+	a:=500+(a*10);
+	for i:=1 to length(msg) do
+		begin
+			health:=msg[i];
+			outTextXY(500+(i*7),a,health);
+			delay(150);
+		end;
+	delay(1000);
+end;
+begin
+	bag['x','a']:=600;
+	bag['y','a']:=500;
+	g:=15;
+	t:=0.5;
+	initGraph(i,j,'');
+	x:=700;
+	y:=10;
+	w:=4;
+	{msg:='kill evil masterlord to have winneder you';
+	fun(1);
+	msg:='use supreme numbers five one and three for moving ike, your guy';
+	fun(2);
+	msg:='wasd to use smash attacks';
+	fun(3);
+	msg:='press q before w, a, or d smash to perform a special';
+	fun(4);
+	msg:='butterino to continerino';
+	fun(5);}
+	repeat until keyPressed();
+	clearViewPort();
+	repeat
+		line(0,850,1580,850);
+		if keyPressed
+			then begin
+				q:=10;
+				input:=readKey;
+			end
+			else if input<>'q'
+				then if q=0
+					then input:='o'
+					else dec(q);
+		if ctrl>0
+			then input:='o'
+			else dec(ctrl);
+		if input<>'q'
+			then if not(s)
+				then begin
+					case input of
+						'w':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(3);
+							end;
+						's':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(4);
+							end;
+						'a':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(2);
+							end;
+						'd':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(2);
+							end;
+						'5':m[10]:=true;
+						'1':m[11]:=true;
+						'3':m[13]:=true;
+					end;
+				end
+				else begin
+					case input of
+						'w':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								if w=1
+									then createObject(7)
+									else createObject(8);
+								j:=1;
+								dj:=1;
+							end;
+						'a':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(6);
+								j:=1;
+								dj:=1;
+							end;
+						'd':if ssc=0
+							then begin
+								if ((ctrl>0) and (vx<>0))
+									then begin
+										if w=1
+											then input:='1'
+											else input:='3';
+										q:=10;
+									end;
+								createObject(5);
+								j:=1;
+								dj:=1;
+							end;
+						'5':m[10]:=true;
+						'1':m[11]:=true;
+						'3':m[13]:=true;
+					end;
+					s:=false;
+					swordColor:='g';
+				end
+			else if not(s)
+				then begin
+					swordColor:='b';
+					s:=true;
+				end;
+		if ((input='w') or (input='s') or (input='a') or (input='d') or (input='e') or (input='5'))
+			then input:='o';
+		for i:=1 to 50 do
+			if o[i,1]<>0
+				then objectPhysics(i);
+		if jde>0
+			then dec(jde);
+		if m[10]
+			then if j=1
+				then if dj<>1
+					then begin
+						dj:=1;
+						vy:=-80;
+						createObject(1);
+					end
+					else
+				else begin
+					j:=1;
+					vy:=-80;
+					createObject(1);
+				end;
+		if m[11]
+			then vx:=-20
+			else if m[13]
+				then vx:=20
+				else vx:=0;
+		dx:=(vx*t)+dx;
+		if r=false
+			then begin
+				dy:=(vy*t)+dy;
+				vy:=vy+(g*t);
+			end;
+		while dx>=1 do
+			begin
+				dx:=dx-1;
+				inc(x);
+			end;
+		while dx<=-1 do
+			begin
+				dx:=dx+1;
+				dec(x);
+			end;
+		while dy>=1 do
+			begin
+				dy:=dy-1;
+				inc(y);
+			end;
+		while dy<=-1 do
+			begin
+				dy:=dy+1;
+				dec(y);
+			end;
+		if y>795
+			then begin
+				vy:=0;
+				y:=795;
+				j:=0;
+				dj:=0;
+			end;
+		if x>=1580
+			then x:=1560;
+		if x<=0
+			then x:=10;
+		if vx>0
+			then w:=0
+			else if vx<0
+				then w:=1;
+		if bag['v','x']<>0
+			then if bag['y','a']=773
+				then if bag['v','x']<0
+					then bag['v','x']:=ceil(bag['v','x']/4)
+					else bag['v','x']:=floor(bag['v','x']/4)
+				else if bag['v','x']<0
+					then bag['v','x']:=ceil(bag['v','x']*8/9)
+					else bag['v','x']:=floor(bag['v','x']*8/9);
+		bag['x','a']:=bag['x','a']+floor(bag['v','x']*t);
+		bag['v','y']:=bag['v','y']+floor(10*t);
+		bag['y','a']:=bag['y','a']+floor(bag['v','y']*t);
+		str(bag['h','p'],health);
+		setColor(green);
+		outTextXY(100,100,health+'%');
+		if bag['x','a']<=0
+			then begin
+				bag['x','a']:=10;
+				bag['v','x']:=-bag['v','x'];
+			end;
+ 		if bag['x','a']>=1580
+			then begin
+				bag['x','a']:=1550;
+				bag['v','x']:=-bag['v','x'];
+			end;
+		if bag['y','a']>773
+			then begin
+				bag['v','y']:=0;
+				bag['y','a']:=773;
+			end;
+		ike(x,y,w);
+		sandbag();
+		delay(40);
+		setColor(black);
+		outTextXY(100,100,health+'%');
+		clearIke(x,y,w);
+		clearSandbag();
+		for i:=1 to 50 do
+			clearObject(i);
+		setColor(white);
+		for i:=1 to 13 do
+			m[i]:=false;
+		if invul>0
+			then dec(invul);
+		if bag['y','a']<0
+			then break;
+	until i>i;
+	clearViewPort();
+	outTextXY(500,500,'y');
+	delay(150);
+	outTextXY(510,500,'o');
+	delay(150);
+	outTextXY(520,500,'u');
+	delay(150);
+	outTextXY(530,500,' ');
+	delay(150);
+	outTextXY(540,500,'a');
+	delay(150);
+	outTextXY(550,500,'m');
+	delay(150);
+	outTextXY(560,500,' ');
+	delay(150);
+	outTextXY(570,500,'w');
+	delay(150);
+	outTextXY(580,500,'e');
+	delay(150);
+	outTextXY(590,500,'e');
+	delay(150);
+	outTextXY(600,500,'n');
+	delay(150);
+	randomize();
+	for i:=5000 downto 200 do
+		beep(random(i),250);
+	readLn();
+end.
